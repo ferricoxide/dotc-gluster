@@ -2,6 +2,81 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "GlusterFS replicated volume CloudFormation template.",
   "Mappings": {},
+  "Metadata": {
+    "AWS::CloudFormation::Interface": {
+      "ParameterGroups": [
+        {
+          "Label": {
+            "default": "Instance Parms"
+          },
+          "Parameters": [
+            "AmiId",
+            "ClusterInstanceType",
+            "ClusterSecurityGroup",
+            "GlusterSubnets",
+            "ShareVolDev",
+            "ShareVolType",
+            "ShareVolSize",
+            "KeyPairName",
+            "GlusNodeName",
+            "GlusNodeNumber",
+            "GlusDomName",
+            "InstanceProfile",
+            "GlusterPartnerIp"
+          ]
+        },
+        {
+          "Label": {
+            "default": "Miscellaneous Settings"
+          },
+          "Parameters": [
+            "ConsumerApplication",
+            "GlusterOsprepScript",
+            "GlusterGfsScript",
+            "CfnEndpointUrl",
+            "EpelRepo",
+            "PipRpm",
+            "PyStache"
+          ]
+        }
+      ],
+      "ParameterLabels": {
+        "ClusterInstanceType": {
+          "default": "EC2 Instance-type"
+        },
+        "ClusterSecurityGroup": {
+          "default": "EC2 SecurityGroups"
+        },
+        "GlusterSubnets": {
+          "default": "EC2 Subnet"
+        },
+        "GlusNodeName": {
+          "default": "Hostname"
+        },
+        "GlusNodeNumber": {
+          "default": "Hostname-suffix"
+        },
+        "GlusDomName": {
+          "default": "Host DomainName"
+        },
+        "InstanceProfile": {
+          "default": "EC2 InstanceRole Name"
+        },
+        "GlusterPartnerIp": {
+          "default": "Gluster Partner IP-address"
+        },
+        "GlusterOsprepScript": {
+          "default": "OS Prep-Script URL"
+        },
+        "GlusterGfsScript": {
+          "default": "GlusterFS Prep-Script URL"
+        },
+        "ConsumerApplication": {
+          "default": "Hosted Application Name"
+        }
+      }
+    }
+  },
   "Conditions": {
     "AssignInstanceRole": {
       "Fn::Not": [
@@ -86,7 +161,7 @@
       "Type": "String"
     },
     "GlusDomName": {
-      "Description": "FQDN to be applied to Gluster member-nodes.",
+      "Description": "FQDN to be added to the Gluster node-name.",
       "Type": "String"
     },
     "GlusterGfsScript": {
@@ -95,11 +170,11 @@
       "Type": "String"
     },
     "GlusNodeName": {
-      "Description": "Base node-name to derive individual Gluster node-names.",
+      "Description": "Node-name to assign to the Gluster host.",
       "Type": "String"
     },
     "GlusNodeNumber": {
-      "Description": "Base node-name to derive individual Gluster node-names.",
+      "Description": "Node-ID to assign to the Gluster host.",
       "Type": "String"
     },
     "GlusterPartnerIp": {
@@ -113,7 +188,7 @@
     },
     "GlusterSubnets": {
       "Description": "List of subnets to deploy Gluster instances into.",
-      "Type": "List<AWS::EC2::Subnet::Id>"
+      "Type": "AWS::EC2::Subnet::Id"
     },
     "InstanceProfile": {
       "Description": "IAM instance profile to apply to the instance(s)",
@@ -275,7 +350,7 @@
         "InstanceType": { "Ref": "ClusterInstanceType" },
         "KeyName": { "Ref": "KeyPairName" },
         "SecurityGroupIds": { "Ref": "ClusterSecurityGroup" },
-        "SubnetId": { "Fn::Select": [ "0", { "Ref": "GlusterSubnets" } ] },
+        "SubnetId": { "Ref": "GlusterSubnets" },
         "Tags": [
           {
             "Key": "Name",
